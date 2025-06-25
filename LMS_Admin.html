@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXB Visa Bridge LMS | Professional Lead Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .login-logo {
+            margin-bottom: 30px;
+        }
+        
+        .login-logo h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .login-logo i {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .login-logo p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 10px rgba(114, 9, 183, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: #6510a0;
+            box-shadow: 0 6px 15px rgba(114, 9, 183, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        
+        .lms-wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0 30px 10px;
+        }
+
+        .sidebar-header i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-link i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-link:hover {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .sidebar-link.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Sidebar Footer */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .user-profile-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: transparent;
+        }
+
+        .user-profile-container:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .user-profile-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        .user-profile-info #userEmail {
+            font-size: 0.75rem;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .sidebar-footer .user-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        /* Custom Language Dropdown */
+        .language-dropdown {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .language-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        .language-toggle:hover, .language-toggle.open {
+             border-color: var(--primary);
+             background-color: white;
+        }
+        .language-toggle .fas {
+            transition: transform 0.3s ease;
+        }
+        .language-toggle.open .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        .language-options {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1200;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--light-gray);
+            animation: fadeIn 0.2s;
+        }
+        .language-options.show {
+            display: block;
+        }
+        .language-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .language-option .fa-check {
+            color: var(--primary);
+            visibility: hidden;
+        }
+        .language-option.selected .fa-check {
+            visibility: visible;
+        }
+
+        .profile-popover {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1200;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--light-gray);
+        }
+
+        .profile-popover.show {
+            display: block;
+            animation: fadeIn 0.2s;
+        }
+
+        .popover-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--dark);
+            font-family: 'Poppins', sans-serif;
+        }
+        .popover-btn i {
+            width: 20px;
+            text-align: center;
+            color: var(--gray);
+        }
+        .popover-btn:hover {
+            background-color: var(--light-gray);
+        }
+        .popover-btn.logout-btn:hover {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+        }
+        .popover-btn.logout-btn:hover i {
+            color: var(--danger);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .main-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .admin-badge, .role-badge {
+            background: var(--success);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .role-badge.manager { background-color: var(--warning); color: var(--dark); }
+        .role-badge.admin { background-color: var(--primary); }
+        .role-badge.user { background-color: var(--gray); }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .section-title {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title h3 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            color: var(--dark);
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 25px;
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--light-gray);
+            height: 100%;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+            align-items: start;
+        }
+        .settings-grid .form-container h4 {
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        #userManagementSection {
+            grid-column: 1 / -1;
+        }
+
+        #userManagementSection .responsive-table th, 
+        #userManagementSection .responsive-table td {
+            padding: 10px 12px;
+        }
+        #userManagementSection .actions-cell {
+            gap: 8px;
+        }
+        #userManagementSection .status-select {
+            padding: 6px 10px;
+            min-width: 120px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .conditional-field {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafc;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary);
+            animation: slideDown 0.3s ease;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .info-text {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--warning);
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        #cancelEditBtn {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        #cancelEditBtn:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .responsive-table th, .responsive-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+            white-space: nowrap;
+        }
+
+        .responsive-table th {
+            background: #f8fafd;
+            font-weight: 600;
+            color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .responsive-table tbody tr {
+            transition: var(--transition);
+        }
+        
+        .responsive-table tbody tr:hover {
+            background: rgba(67, 97, 238, 0.03);
+        }
+        
+        a.whatsapp-link {
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+        }
+         a.whatsapp-link:hover {
+            text-decoration: underline;
+         }
+        
+        .visa-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        .visa-tag i { margin-right: 5px; }
+        
+        .visa-visit { background: rgba(6, 214, 160, 0.15); color: #059669; }
+        .visa-cancelled { background: rgba(239, 71, 111, 0.15); color: #dc2626; }
+        .visa-active { background: rgba(67, 97, 238, 0.15); color: var(--primary); }
+        
+        .status-badge, .priority-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .priority-low { background-color: #3498db; color: white; }
+        .priority-medium { background-color: #f1c40f; color: var(--dark); }
+        .priority-high { background-color: #e74c3c; color: white; }
+
+        .status-pending { background: rgba(255, 209, 102, 0.15); color: #d97706; }
+        .status-done { background: rgba(6, 214, 160, 0.15); color: #059669; }
+        .status-not-agreed { background: rgba(239, 71, 111, 0.15); color: #dc2626; }
+        .status-not-visited { background: rgba(156, 163, 175, 0.15); color: #4b5563; }
+        
+        .actions-cell { display: flex; gap: 10px; }
+        .action-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--light); color: var(--gray);
+            border: none; cursor: pointer; transition: var(--transition); font-size: 1rem;
+        }
+        .action-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .action-btn.delete-btn:hover { background: var(--danger); }
+        .action-btn.edit-btn:hover { background: var(--warning); color: var(--dark); }
+        .action-btn.archive-btn:hover { background: var(--secondary); }
+        .action-btn.restore-btn:hover { background: var(--success); }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--primary);
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 20px auto;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        .info-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--light-gray);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .info-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .info-card .card-header h4 { font-size: 1.2rem; font-weight: 600; color: var(--dark); }
+        .info-card .card-body p { margin-bottom: 10px; color: var(--gray); }
+        .info-card .card-body strong { color: var(--dark); font-weight: 500; }
+        .info-card .card-footer { margin-top: 20px; border-top: 1px solid var(--light-gray); padding-top: 15px; }
+
+        .toast {
+            position: fixed; top: 20px; right: 20px; padding: 18px 26px;
+            border-radius: var(--border-radius); color: white; font-weight: 500;
+            box-shadow: var(--box-shadow); z-index: 1050; display: flex;
+            align-items: center; gap: 12px; transform: translateX(110%); transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast i { font-size: 1.3rem; }
+        
+        .modal-overlay {
+            display: none; position: fixed; z-index: 1001;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe; padding: 30px; border: 1px solid #888;
+            width: 90%; max-width: 500px; border-radius: var(--border-radius);
+            animation: fadeIn 0.3s; text-align: center;
+        }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 25px; color: var(--gray); }
+        .modal-actions { display: flex; justify-content: center; gap: 15px; }
+        .modal-actions .btn { width: auto; min-width: 120px; }
+        
+        .hidden { display: none !important; }
+        
+        .status-select {
+            padding: 8px 12px; border-radius: 20px; border: 2px solid var(--light-gray);
+            font-size: 0.85rem; font-weight: 500; background: white;
+            cursor: pointer; transition: var(--transition);
+        }
+        .status-select:focus { outline: none; border-color: var(--primary); }
+        
+        .admin-controls {
+            background: #f8fafd; padding: 20px; border-radius: var(--border-radius);
+            margin-bottom: 30px; border: 1px solid var(--light-gray);
+        }
+        .admin-controls-group {
+            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+        }
+        .admin-controls-group .form-control, .admin-controls-group .btn { width: auto; margin-top: 0; }
+        .admin-controls-group > label { font-weight: 500; }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+        .dashboard-card {
+            background: white; padding: 25px; border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--light-gray);
+        }
+        
+        #companyPriceDisplay {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <h1><i class="fas fa-chart-line"></i> DXB Visa Bridge LMS</h1>
+                <p>Your Professional Lead Management Partner</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn">Sign In</button>
+                <div style="margin-top: 20px; text-align: center; color: var(--gray);">
+                    <p>
+                      <a href="https://instagram.com/zem.4m" target="_blank" style="text-decoration: none; color: inherit;">
+                        <i class="fab fa-instagram" style="margin-right: 6px; color: #E1306C;"></i>Developed By Planner Zohaib Sarwar
+                      </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="lms-wrapper hidden" id="appContainer">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>DXB Bridge</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a class="sidebar-link" data-page="addClientPanel">
+                    <i class="fas fa-user-plus"></i> Add Client
+                </a>
+                <a class="sidebar-link" data-page="clientData">
+                    <i class="fas fa-users"></i> Client Data
+                </a>
+                <a class="sidebar-link admin-only hidden" data-page="archivedData">
+                    <i class="fas fa-archive"></i> Archived
+                </a>
+                 <a class="sidebar-link admin-only hidden" data-page="settingsPanel">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div id="profilePopover" class="profile-popover">
+                    <button id="adminSettingsBtn" class="popover-btn admin-only hidden">
+                        <i class="fas fa-cogs"></i> Admin Settings
+                    </button>
+                    <button id="logoutBtn" class="popover-btn logout-btn">
+                        <i class="fas fa-power-off"></i> Logout
+                    </button>
+                </div>
+
+                <div class="language-dropdown">
+                    <div id="language-options" class="language-options">
+                        <button class="popover-btn language-option" data-lang-value="en">
+                            <span>English</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="popover-btn language-option" data-lang-value="hi">
+                            <span>हिंदी</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="popover-btn language-option" data-lang-value="ar">
+                            <span>العربية</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                    <button id="language-toggle" class="language-toggle">
+                        <span id="selected-language-text"><i class="fas fa-globe"></i> English</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+
+               <div id="userProfileContainer" class="user-profile-container">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-profile-info">
+                        <div style="font-weight: 600;" id="userName">John Doe</div>
+                        <div id="userEmail"></div>
+                    </div>
+               </div>
+           </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="pageTitle">Dashboard</h1>
+            </header>
+            
+            <div id="dashboard" class="page active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <canvas id="visaStatusChart"></canvas>
+                    </div>
+                    <div class="dashboard-card">
+                        <canvas id="overallStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="addClientPanel" class="page">
+                <div class="section-title"><h3 id="formTitle" data-lang="addNewLead">Add New Client Lead</h3></div>
+                <div class="form-container">
+                    <form id="clientForm">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="clientName" data-lang="clientName">Client Name</label>
+                                    <input type="text" id="clientName" class="form-control" placeholder="Enter client name" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="phone" data-lang="phone">Phone Number</label>
+                                    <input type="tel" id="phone" class="form-control" placeholder="Enter phone number" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                             <div class="form-col">
+                                <div class="form-group">
+                                    <label for="nationality" data-lang="nationality">Nationality</label>
+                                    <select id="nationality" class="form-control" required>
+                                        <option value="">Select Nationality</option>
+                                        <option value="India">India</option>
+                                        <option value="Pakistan">Pakistan</option>
+                                        <option value="Nigerian">Nigerian</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="location" data-lang="location">Location</label>
+                                    <select id="location" class="form-control" required>
+                                        <option value="">Select Location</option>
+                                        <option value="Inside UAE">Inside UAE</option>
+                                        <option value="Outside UAE">Outside UAE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                           <div class="form-col">
+                                <div class="form-group">
+                                    <label for="visaStatus" data-lang="visaStatus">Current Visa Status</label>
+                                    <select id="visaStatus" class="form-control" required>
+                                        <option value="">Select visa status</option>
+                                        <option value="visit">Visit visa</option>
+                                        <option value="cancelled">Cancelled visa</option>
+                                        <option value="active">Active visa</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="form-col"><div class="form-group"><label for="educationCertificate" data-lang="educationCertificate">Attested Education Certificate</label><select id="educationCertificate" class="form-control" required><option value="">Select option</option><option value="yes">Yes</option><option value="no">No</option></select></div></div>
+                        </div>
+                        
+                        <div id="visaConditionalFields">
+                            <div id="visitVisaFields" class="conditional-field hidden"><div class="form-group"><label for="daysLeft" data-lang="daysLeft">How many days left?</label><input type="number" id="daysLeft" class="form-control" placeholder="Enter number of days" min="1"></div></div>
+                            <div id="cancelledVisaFields" class="conditional-field hidden">
+                                <div class="form-group"><label for="cancelledDate" data-lang="cancelledDate">When was it cancelled?</label><input type="date" id="cancelledDate" class="form-control"></div>
+                                <div class="form-group"><label for="cancelledDaysLeft" data-lang="cancelledDaysLeft">How many days are left?</label><input type="number" id="cancelledDaysLeft" class="form-control" placeholder="Enter number of days" min="1"></div>
+                            </div>
+                            <div id="activeVisaFields" class="conditional-field hidden">
+                                <div class="form-group">
+                                    <label data-lang="needFor">Need for yourself or someone else?</label>
+                                    <div class="radio-option">
+                                        <input type="radio" id="forYourself" name="needFor" value="yourself">
+                                        <label for="forYourself" data-lang="forYourself">For yourself</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="forSomeoneElse" name="needFor" value="someoneElse">
+                                        <label for="forSomeoneElse" data-lang="forSomeoneElse">For someone else</label>
+                                    </div>
+                                </div>
+                                <div id="yourselfFields" class="conditional-field hidden"><div class="form-group"><label for="whenDate" data-lang="when">When?</label><input type="date" id="whenDate" class="form-control"></div></div>
+                                <div id="someoneElseFields" class="conditional-field hidden"><div class="form-group"><label for="forWhom" data-lang="forWhom">For whom do you need a visa?</label><input type="text" id="forWhom" class="form-control" placeholder="E.g., wife, brother"></div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col"><div class="form-group"><label for="desiredSalary" data-lang="desiredSalary">Desired Salary</label><input type="text" id="desiredSalary" class="form-control" placeholder="e.g., AED 5000"></div></div>
+                             <div class="form-col"><div class="form-group"><label for="visitTime" data-lang="visitTime">Time of Visit to Our Office</label><input type="datetime-local" id="visitTime" class="form-control"></div></div>
+                        </div>
+
+                        <div id="educationConditionalFields">
+                            <div id="educationYesFields" class="conditional-field hidden"><div class="form-group"><label for="position" data-lang="position">What position to mention on ID?</label><input type="text" id="position" class="form-control" placeholder="e.g., Sales Manager"></div></div>
+                            <div id="educationNoFields" class="conditional-field hidden"><div class="info-text"><i class="fas fa-info-circle"></i><span data-lang="salesOfficerOnly">Only Sales Officer will be available</span></div></div>
+                        </div>
+                        
+                        <div id="pricingSection" class="conditional-field hidden">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label data-lang="companyPrice">Company Price</label>
+                                        <p id="companyPriceDisplay" data-lang="selectNationalityLocation">Select nationality and location first</p>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="clientQuotedPrice" data-lang="quotedPrice">Price Quoted to Client (AED)</label>
+                                        <input type="number" id="clientQuotedPrice" class="form-control" placeholder="e.g., 7500">
+                                    </div>
+                                </div>
+                            </div>
+                             <div id="nigerianVisaInfo" class="info-text hidden"><i class="fas fa-info-circle"></i> <span data-lang="freezoneVisa">This will be a Freezone visa.</span></div>
+                             <div id="nigerianNotAvailableInfo" class="info-text hidden"><i class="fas fa-times-circle"></i><span data-lang="nigerianNotAvailable">Service not available for Nigerians outside UAE or with non-cancelled visa.</span></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-col"><div class="form-group"><label for="priority" data-lang="priority">Priority</label><select id="priority" class="form-control"><option value="low" data-lang="low">Low</option><option value="medium" data-lang="medium">Medium</option><option value="high" data-lang="high">High</option></select></div></div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn" id="saveClientBtn"><i class="fas fa-save"></i> <span data-lang="saveClient">Save Client</span></button>
+                            <button type="button" class="btn btn-outline" id="clearFormBtn"><i class="fas fa-eraser"></i> <span data-lang="clearForm">Clear Form</span></button>
+                            <button type="button" class="btn btn-outline hidden" id="cancelEditBtn"><i class="fas fa-times-circle"></i><span data-lang="cancelEdit">Cancel Edit</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="clientData" class="page">
+                <div id="adminControls" class="admin-only hidden">
+                    <div class="admin-controls-group" style="margin-bottom: 20px;">
+                        <label for="searchInput" data-lang="search">Search:</label><input type="text" id="searchInput" class="form-control" placeholder="Name or Phone...">
+                        <label for="filterVisaStatus" data-lang="visaStatusFilter">Visa Status:</label><select id="filterVisaStatus" class="form-control"><option value="">All</option><option value="visit">Visit</option><option value="cancelled">Cancelled</option><option value="active">Active</option></select>
+                        <label for="filterOverallStatus" data-lang="overallStatusFilter">Overall Status:</label><select id="filterOverallStatus" class="form-control"><option value="">All</option><option value="pending">Pending</option><option value="done">Done</option><option value="not-agreed">Not Agreed</option><option value="not-visited">Not Visited</option></select>
+                    </div>
+                    <div class="admin-controls-group">
+                        <button class="btn btn-sm btn-danger hidden" id="bulkDeleteBtn" style="background-color: var(--danger);"><i class="fas fa-trash-alt"></i><span data-lang="archiveSelected">Archive Selected</span></button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="clientsTable" class="responsive-table">
+                        <thead>
+                            <tr>
+                                <th class="admin-only hidden"><input type="checkbox" id="selectAllCheckbox"></th>
+                                <th data-lang="clientContact">Client & Contact</th>
+                                <th data-lang="details">Details</th>
+                                <th data-lang="visaEducation">Visa & Education</th>
+                                <th data-lang="pricing">Pricing (AED)</th>
+                                <th data-lang="status">Status</th>
+                                <th data-lang="priority">Priority</th>
+                                <th id="actionsHeader" data-lang="actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="archivedData" class="page admin-only hidden">
+                 <div class="section-title"><h3 data-lang="archivedLeads">Archived Leads</h3></div>
+                 <div id="archived-cards-container" class="card-grid"></div>
+            </div>
+
+            <div id="settingsPanel" class="page admin-only hidden">
+                <div class="section-title"><h3 data-lang="settings">Settings</h3></div>
+                <div class="settings-grid">
+                    <div class="form-container">
+                        <h4 data-lang="changePassword">Change Your Password</h4>
+                        <form id="changePasswordForm">
+                            <div class="form-group"><label for="currentPassword" data-lang="currentPassword">Current Password</label><input type="password" id="currentPassword" class="form-control" placeholder="Enter your current password" required></div>
+                            <div class="form-group"><label for="newPassword" data-lang="newPassword">New Password</label><input type="password" id="newPassword" class="form-control" placeholder="Enter a new password" required></div>
+                            <div class="form-group"><label for="confirmPassword" data-lang="confirmNewPassword">Confirm New Password</label><input type="password" id="confirmPassword" class="form-control" placeholder="Confirm the new password" required></div>
+                            <button type="submit" class="btn" id="updatePasswordBtn"><span data-lang="updatePassword">Update Password</span></button>
+                        </form>
+                    </div>
+
+                    <div class="form-container main-admin-only hidden">
+                        <h4 data-lang="createUser">Create New User</h4>
+                        <form id="createUserForm">
+                             <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="newUserEmail" data-lang="newUserEmail">New User's Email</label>
+                                        <input type="email" id="newUserEmail" class="form-control" placeholder="Enter email" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="newUserPassword" data-lang="newUserPassword">Password</label>
+                                        <input type="password" id="newUserPassword" class="form-control" placeholder="Enter password" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group"><label for="newUserRole" data-lang="assignRole">Assign Role</label>
+                                <select id="newUserRole" class="form-control">
+                                    <option value="user">User</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn" id="createUserBtn"><span data-lang="createUserBtn">Create User</span></button>
+                        </form>
+                    </div>
+                    
+                    <div class="form-container main-admin-only hidden" id="userManagementSection">
+                        <h4 data-lang="userManagement">User Management</h4>
+                        <div class="table-container">
+                            <table class="responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th data-lang="userEmailHeader">User Email</th>
+                                        <th data-lang="currentRole">Current Role</th>
+                                        <th data-lang="actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userManagementTableBody">
+                                    <!-- User rows will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Toast & Modal -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage"></span></div>
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="confirmationTitle">Are you sure?</h3>
+            <p id="confirmationMessage">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirmBtn" class="btn">Confirm</button>
+                <button id="cancelBtn" class="btn btn-outline">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkYC7NABGEjL2ymZ4wNFjYmaqKO8slc30",
+            authDomain: "lead-management-6f631.firebaseapp.com",
+            databaseURL: "https://lead-management-6f631-default-rtdb.firebaseio.com",
+            projectId: "lead-management-6f631",
+            storageBucket: "lead-management-6f631.appspot.com",
+            messagingSenderId: "152258620675",
+            appId: "1:152258620675:web:3c55e51eab973d88bf0d36"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Database Paths
+        const leadsRefPath = 'leads/shared_leads';
+        const usersRefPath = 'users';
+        const MAIN_ADMIN_EMAIL = "zsarwar613@gmail.com";
+
+        
+        let allClientsData = [];
+        let archivedClientsData = [];
+        let dataListenerAttached = false;
+
+        // DOM Element variables
+        let loginScreen, appContainer, loginForm, sidebarLinks, pages, pageTitle, clientForm, clearFormBtn, cancelEditBtn, clientsTableBody, archivedCardsContainer, toast, toastMessage, userAvatar, userName, userEmail, saveClientBtn, adminControls, bulkDeleteBtn, actionsHeader, formTitle, searchInput, filterVisaStatus, filterOverallStatus, changePasswordForm, visaStatusSelect, educationCertificate, nationalitySelect, locationSelect, userProfileContainer, profilePopover, adminSettingsBtn, logoutBtn, languageToggle, languageOptions, selectedLanguageText, createUserForm;
+
+        
+        // State
+        let currentUser = null, currentUserRole = 'user';
+        let currentEditingClientId = null;
+        let visaStatusChart = null, overallStatusChart = null;
+        const chartColors = ['#06d6a0', '#ef476f', '#4361ee', '#ffd166', '#6c757d', '#7209b7'];
+
+
+        // --- NAVIGATION HELPER ---
+        function navigateToPage(pageId) {
+            const linkToActivate = document.querySelector(`.sidebar-link[data-page="${pageId}"]`);
+            if (linkToActivate) {
+                const textElement = linkToActivate.querySelector('i').nextSibling;
+                if(textElement) pageTitle.textContent = textElement.textContent.trim();
+            }
+
+            sidebarLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.page === pageId);
+            });
+            pages.forEach(page => {
+                page.classList.toggle('active', page.id === pageId);
+            });
+
+            if (pageId === 'clientData') applyFilters();
+            if (pageId === 'archivedData') renderArchivedClientData(archivedClientsData);
+            if (pageId === 'dashboard') loadDashboardData();
+            if (pageId === 'settingsPanel') loadUserManagement();
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function showToast(message, isSuccess = true) {
+            toastMessage.textContent = message;
+            toast.className = `toast ${isSuccess ? "toast-success" : "toast-error"} show`;
+            const icon = toast.querySelector('i');
+            icon.className = `fas ${isSuccess ? 'fa-check-circle' : 'fa-times-circle'}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function showConfirmation(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            modal.querySelector('#confirmationTitle').textContent = title;
+            modal.querySelector('#confirmationMessage').textContent = message;
+            modal.style.display = 'flex';
+
+            const confirmBtn = modal.querySelector('#confirmBtn');
+            const cancelBtn = modal.querySelector('#cancelBtn');
+            
+            const close = () => {
+                modal.style.display = 'none';
+                confirmBtn.removeEventListener('click', confirmHandler);
+                cancelBtn.removeEventListener('click', close);
+            };
+            const confirmHandler = () => { onConfirm(); close(); };
+            
+            confirmBtn.addEventListener('click', confirmHandler);
+            cancelBtn.addEventListener('click', close);
+        }
+        
+        // --- AUTH & UI SETUP ---
+        async function initApp() {
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                     // *** NEW: Verify user exists in the database before proceeding ***
+                    const userRef = database.ref(`${usersRefPath}/${user.uid}`);
+                    const snapshot = await userRef.once('value');
+
+                    if (!snapshot.exists() && user.email !== MAIN_ADMIN_EMAIL) {
+                        // If user is not in the database (was deleted), sign them out.
+                        showToast("Your account access has been revoked.", false);
+                        auth.signOut();
+                        return;
+                    }
+                    // *** END NEW ***
+                    
+                    currentUser = user;
+                    await setupUserRole(user);
+                    setupUIForUser();
+                    attachDataListener(); 
+                    navigateToPage('dashboard');
+                } else {
+                    currentUser = null;
+                    currentUserRole = 'user';
+                    setupUIForGuest();
+                    if (dataListenerAttached) {
+                        database.ref(leadsRefPath).off();
+                        dataListenerAttached = false;
+                    }
+                }
+            });
+        }
+        
+        async function setupUserRole(user) {
+            if (user.email === MAIN_ADMIN_EMAIL) {
+                currentUserRole = 'main-admin';
+                return;
+            }
+            const userRef = database.ref(`${usersRefPath}/${user.uid}`);
+            const snapshot = await userRef.once('value');
+            if (snapshot.exists()) {
+                currentUserRole = snapshot.val().role || 'user';
+            } else {
+                currentUserRole = 'user';
+                // This part should theoretically not be reached for non-main-admins due to the check in initApp
+                userRef.set({
+                    email: user.email,
+                    role: currentUserRole,
+                    createdAt: new Date().toISOString()
+                });
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function setupUIForUser() {
+            loginScreen.style.display = 'none';
+            appContainer.classList.remove('hidden');
+            
+            let displayName;
+            if(currentUser.email === MAIN_ADMIN_EMAIL) {
+                displayName = "Planner Zohaib";
+            } else {
+                const emailPrefix = currentUser.email.split('@')[0];
+                displayName = capitalizeFirstLetter(emailPrefix);
+            }
+            
+            userAvatar.textContent = displayName.charAt(0).toUpperCase();
+            userName.textContent = displayName;
+            userEmail.textContent = currentUser.email;
+
+            const isManager = currentUserRole === 'manager' || currentUserRole === 'admin' || currentUserRole === 'main-admin';
+            const isAdmin = currentUserRole === 'admin' || currentUserRole === 'main-admin';
+            const isMainAdmin = currentUserRole === 'main-admin';
+            
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isAdmin));
+            document.querySelectorAll('.manager-only').forEach(el => el.classList.toggle('hidden', !isManager));
+            document.querySelectorAll('.main-admin-only').forEach(el => el.classList.toggle('hidden', !isMainAdmin));
+            
+            if(actionsHeader) actionsHeader.classList.toggle('hidden', !isAdmin);
+            
+            if(adminControls) {
+                adminControls.classList.toggle('hidden', !isManager);
+            }
+
+            if (!isMainAdmin) {
+                document.addEventListener('contextmenu', event => event.preventDefault());
+                document.addEventListener('keydown', event => {
+                    if (event.keyCode === 123 || (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i' || event.key === 'J' || event.key === 'j' || event.key === 'C' || event.key === 'c'))) {
+                        event.preventDefault();
+                    }
+                });
+            }
+        }
+        
+        function setupUIForGuest() {
+            loginScreen.style.display = 'flex';
+            appContainer.classList.add('hidden');
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            if(submitBtn) {
+                submitBtn.innerHTML = 'Sign In';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        function initEventListeners() {
+            loginForm.addEventListener('submit', handleLogin);
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navigateToPage(this.dataset.page);
+                });
+            });
+            
+            clientForm.addEventListener('submit', handleClientFormSubmit);
+            clearFormBtn.addEventListener('click', resetForm);
+            cancelEditBtn.addEventListener('click', resetForm);
+            
+            visaStatusSelect.addEventListener('change', handleVisaStatusChange);
+            educationCertificate.addEventListener('change', handleEducationCertificateChange);
+            document.getElementById('forYourself')?.addEventListener('change', handleActiveVisaChange);
+            document.getElementById('forSomeoneElse')?.addEventListener('change', handleActiveVisaChange);
+
+            [nationalitySelect, locationSelect, visaStatusSelect].forEach(el => {
+                el.addEventListener('change', updateCompanyPrice);
+            });
+            
+            if(changePasswordForm) {
+                changePasswordForm.addEventListener('submit', handleChangePassword);
+            }
+             if(createUserForm) {
+                createUserForm.addEventListener('submit', handleCreateUser);
+            }
+            if(searchInput) {
+                 [searchInput, filterVisaStatus, filterOverallStatus].forEach(el => el.addEventListener('input', applyFilters));
+            }
+            
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', handleSelectAll);
+            }
+            if (bulkDeleteBtn) {
+                bulkDeleteBtn.addEventListener('click', handleBulkArchive);
+            }
+            
+            // --- POPOVER AND DROPDOWN LISTENERS ---
+            languageToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                languageOptions.classList.toggle('show');
+                languageToggle.classList.toggle('open');
+            });
+            
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const langValue = e.currentTarget.dataset.langValue;
+                    setLanguage(langValue);
+                    languageOptions.classList.remove('show');
+                    languageToggle.classList.remove('open');
+                });
+            });
+
+            userProfileContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profilePopover.classList.toggle('show');
+            });
+
+            adminSettingsBtn.addEventListener('click', () => {
+                navigateToPage('settingsPanel');
+                profilePopover.classList.remove('show');
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut();
+                showToast("You have been logged out.", true);
+                profilePopover.classList.remove('show');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!profilePopover.contains(event.target) && !userProfileContainer.contains(event.target)) {
+                    profilePopover.classList.remove('show');
+                }
+                if (!languageOptions.contains(event.target) && !languageToggle.contains(event.target)) {
+                    languageOptions.classList.remove('show');
+                    languageToggle.classList.remove('open');
+                }
+            });
+        }
+
+        // --- AUTH HANDLERS ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+            submitBtn.disabled = true;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    showToast(`Welcome back!`, true);
+                })
+                .catch(error => {
+                    showToast("Login failed: " + error.message, false);
+                }).finally(() => {
+                    submitBtn.innerHTML = 'Sign In';
+                    submitBtn.disabled = false;
+                });
+        }
+        
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const updateBtn = document.getElementById('updatePasswordBtn');
+
+            if (newPassword !== confirmPassword) {
+                showToast("New passwords do not match.", false);
+                return;
+            }
+            if (newPassword.length < 6) {
+                showToast("Password should be at least 6 characters long.", false);
+                return;
+            }
+
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            const user = auth.currentUser;
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+
+            user.reauthenticateWithCredential(credential).then(() => {
+                return user.updatePassword(newPassword);
+            }).then(() => {
+                showToast("Password updated successfully!", true);
+                changePasswordForm.reset();
+            }).catch((error) => {
+                showToast(`Error: ${error.message}`, false);
+            }).finally(() => {
+                updateBtn.disabled = false;
+                updateBtn.querySelector('span').textContent = 'Update Password';
+            });
+        }
+        
+        async function handleCreateUser(e) {
+            e.preventDefault();
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+            const createBtn = document.getElementById('createUserBtn');
+
+            createBtn.disabled = true;
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            let secondaryApp;
+            try {
+                // Initialize a secondary app to create user without signing out the admin
+                secondaryApp = firebase.initializeApp(firebaseConfig, `secondary-auth-create-${Date.now()}`);
+                const secondaryAuth = secondaryApp.auth();
+
+                const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+                const newUser = userCredential.user;
+
+                // Set role in the database
+                await database.ref(`${usersRefPath}/${newUser.uid}`).set({
+                    email: email,
+                    role: role,
+                    createdAt: new Date().toISOString()
+                });
+
+                showToast('User created successfully!', true);
+                createUserForm.reset();
+                loadUserManagement(); // Refresh the user list
+
+            } catch (error) {
+                showToast(`Error creating user: ${error.message}`, false);
+            } finally {
+                createBtn.disabled = false;
+                const span = createBtn.querySelector('span');
+                if (span) {
+                    span.textContent = 'Create User';
+                } else {
+                    createBtn.textContent = 'Create User';
+                }
+                if (secondaryApp) {
+                    await secondaryApp.auth().signOut();
+                    await secondaryApp.delete();
+                }
+            }
+        }
+        
+        function handleVisaStatusChange() {
+            const status = visaStatusSelect.value;
+            document.querySelectorAll('#visaConditionalFields > .conditional-field').forEach(el => el.classList.add('hidden'));
+            if (status === 'visit') document.getElementById('visitVisaFields').classList.remove('hidden');
+            else if (status === 'cancelled') document.getElementById('cancelledVisaFields').classList.remove('hidden');
+            else if (status === 'active') {
+                document.getElementById('activeVisaFields').classList.remove('hidden');
+                handleActiveVisaChange();
+            }
+            updateCompanyPrice(); 
+        }
+        
+        function handleActiveVisaChange() {
+            const forYourselfChecked = document.getElementById('forYourself')?.checked;
+            document.getElementById('yourselfFields').classList.toggle('hidden', !forYourselfChecked);
+            document.getElementById('someoneElseFields').classList.toggle('hidden', forYourselfChecked);
+        }
+        
+        function handleEducationCertificateChange() {
+            const status = educationCertificate.value;
+            document.getElementById('educationYesFields').classList.toggle('hidden', status !== 'yes');
+            document.getElementById('educationNoFields').classList.toggle('hidden', status !== 'no');
+        }
+
+        // --- DATA HANDLING ---
+        function attachDataListener() {
+            if (dataListenerAttached) return; 
+            
+            const targetRef = database.ref(leadsRefPath);
+            
+            targetRef.on('value', snapshot => {
+                let clients = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        clients.push({ id: child.key, ...child.val() });
+                    });
+                }
+
+                const isPrivileged = currentUserRole === 'admin' || currentUserRole === 'main-admin' || currentUserRole === 'manager';
+                if (isPrivileged) {
+                    allClientsData = clients.filter(c => !c.isArchived).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                } else {
+                    allClientsData = clients.filter(c => !c.isArchived && c.addedBy === currentUser.email).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                }
+                
+                archivedClientsData = clients.filter(c => c.isArchived).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                applyFilters();
+                renderArchivedClientData(archivedClientsData);
+                loadDashboardData();
+
+                dataListenerAttached = true;
+            }, error => {
+                console.error("Firebase Read Error: ", error);
+                showToast("Error loading real-time data: " + error.message, false);
+            });
+        }
+        
+        function handleClientFormSubmit(e) {
+            e.preventDefault();
+            saveClientBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveClientBtn.disabled = true;
+
+            try {
+                if (!currentUser) {
+                    showToast("You must be logged in to save a client.", false);
+                    throw new Error("User not authenticated");
+                }
+                
+                const existingClient = currentEditingClientId ? [...allClientsData, ...archivedClientsData].find(c => c.id === currentEditingClientId) || {} : {};
+
+                const getNumericValue = (id) => {
+                    const value = document.getElementById(id).value;
+                    return value ? parseFloat(value) : null;
+                };
+
+                const formData = {
+                    name: document.getElementById('clientName').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    nationality: document.getElementById('nationality').value,
+                    location: document.getElementById('location').value,
+                    visaStatus: visaStatusSelect.value,
+                    educationCert: document.getElementById('educationCertificate').value,
+                    salary: document.getElementById('desiredSalary').value.trim(),
+                    visitTime: document.getElementById('visitTime').value,
+                    priority: document.getElementById('priority').value,
+                    companyPrice: document.getElementById('companyPriceDisplay').textContent,
+                    clientQuotedPrice: getNumericValue('clientQuotedPrice'),
+                    status: existingClient.status || "pending",
+                    timestamp: existingClient.timestamp || new Date().toISOString(),
+                    addedBy: existingClient.addedBy || currentUser.email,
+                    lastUpdatedBy: currentUser.email,
+                    lastUpdateTimestamp: new Date().toISOString(),
+                    isArchived: existingClient.isArchived || false,
+                    visaInfo: {},
+                    position: ''
+                };
+
+                if (formData.visaStatus === 'visit') {
+                    formData.visaInfo = { daysLeft: getNumericValue('daysLeft') };
+                } else if (formData.visaStatus === 'cancelled') {
+                    formData.visaInfo = { 
+                        cancelledDate: document.getElementById('cancelledDate').value, 
+                        daysLeft: getNumericValue('cancelledDaysLeft') 
+                    };
+                } else if (formData.visaStatus === 'active') {
+                    const needFor = document.querySelector('input[name="needFor"]:checked')?.value;
+                    formData.visaInfo = { needFor };
+                    if (needFor === 'yourself') formData.visaInfo.when = document.getElementById('whenDate').value;
+                    else if (needFor === 'someoneElse') formData.visaInfo.forWhom = document.getElementById('forWhom').value;
+                }
+
+                if (formData.educationCert === 'yes') {
+                    formData.position = document.getElementById('position').value;
+                } else {
+                    formData.position = 'Sales Officer';
+                }
+                
+                const leadsRef = database.ref(leadsRefPath);
+                const operation = currentEditingClientId ? leadsRef.child(currentEditingClientId).update(formData) : leadsRef.push(formData);
+
+                operation.then(() => {
+                    showToast(`Client ${currentEditingClientId ? 'updated' : 'saved'} successfully!`, true);
+                    resetForm();
+                    navigateToPage('clientData');
+                }).catch(error => {
+                    console.error("Firebase save error:", error);
+                    showToast(`Error saving data: ${error.message}`, false);
+                }).finally(() => {
+                    saveClientBtn.innerHTML = '<i class="fas fa-save"></i> Save Client';
+                    saveClientBtn.disabled = false;
+                });
+
+            } catch (error) {
+                console.error("Error in form submission logic:", error);
+                showToast(`An unexpected error occurred: ${error.message}`, false);
+                saveClientBtn.innerHTML = '<i class="fas fa-save"></i> Save Client';
+                saveClientBtn.disabled = false;
+            }
+        }
+        
+        function resetForm() {
+            clientForm.reset();
+            document.querySelectorAll('.conditional-field, #pricingSection, .info-text').forEach(el => el.classList.add('hidden'));
+            if(formTitle) formTitle.setAttribute('data-lang', 'addNewLead');
+            setLanguage(localStorage.getItem('language') || 'en'); 
+            currentEditingClientId = null;
+            cancelEditBtn.classList.add('hidden');
+            clearFormBtn.classList.remove('hidden');
+            saveClientBtn.disabled = false;
+        }
+
+        // --- WHATSAPP INTEGRATION ---
+        function openWhatsApp(clientId) {
+            const client = allClientsData.find(c => c.id === clientId);
+            if (!client || !client.phone) {
+                showToast("Client phone number not available.", false);
+                return;
+            }
+
+            let phoneNumber = client.phone.replace(/[^0-9]/g, ''); 
+            
+            if (phoneNumber.length > 9 && phoneNumber.startsWith('05')) {
+                phoneNumber = '9715' + phoneNumber.substring(2);
+            } else if (phoneNumber.length === 9 && phoneNumber.startsWith('5')) {
+                phoneNumber = '971' + phoneNumber;
+            }
+
+            const message = `Hello ${client.name},\nI came to know you are looking for a freelance visa. \n\nYour Details:\n- Nationality: ${client.nationality}\n- Current Visa: ${client.visaStatus}`;
+
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // --- RENDERING ---
+        function renderClientData(clients) {
+            clientsTableBody.innerHTML = '';
+            const isAdminView = currentUserRole === 'admin' || currentUserRole === 'main-admin';
+            const colspan = isAdminView ? 8 : 7;
+            if (clients.length === 0) {
+                clientsTableBody.innerHTML = `<tr><td colspan="${colspan}" style="text-align: center; padding: 40px;">No matching leads found.</td></tr>`;
+                return;
+            }
+            
+            clients.forEach(client => {
+                const row = clientsTableBody.insertRow();
+                row.dataset.id = client.id;
+                
+                let visaDetailsHTML = '';
+                switch (client.visaStatus) {
+                    case 'visit': visaDetailsHTML = `<div class="visa-tag visa-visit"><i class="fas fa-plane"></i>Visit (${client.visaInfo?.daysLeft || 'N/A'} days)</div>`; break;
+                    case 'cancelled': visaDetailsHTML = `<div class="visa-tag visa-cancelled"><i class="fas fa-ban"></i>Cancelled (${client.visaInfo?.daysLeft || 'N/A'} days)</div>`; break;
+                    case 'active': visaDetailsHTML = `<div class="visa-tag visa-active"><i class="fas fa-check-circle"></i>Active</div>`; break;
+                }
+                 if(client.visaStatus === 'active' && client.visaInfo?.forWhom) {
+                    visaDetailsHTML += `<br><small>For: ${client.visaInfo.forWhom}</small>`;
+                }
+
+
+                let certDetailsHTML = (client.educationCert === 'yes')
+                    ? `<span style="color:var(--success); font-weight:bold;">Yes</span><br><small>Pos: ${client.position || 'N/A'}</small>`
+                    : `<span style="color:var(--danger); font-weight:bold;">No</span>`;
+
+                let statusDisplayHTML = `<div class="status-badge status-${(client.status || 'pending').replace(/\s+/g, '-')}">${(client.status || 'pending')}</div>`;
+                if(isAdminView) {
+                    statusDisplayHTML = `<select class="status-select" onchange="updateStatus('${client.id}', this.value, '${client.name}')">
+                        <option value="pending" ${client.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="done" ${client.status === 'done' ? 'selected' : ''}>Done</option>
+                        <option value="not-agreed" ${client.status === 'not-agreed' ? 'selected' : ''}>Not Agreed</option>
+                        <option value="not-visited" ${client.status === 'not-visited' ? 'selected' : ''}>Not Visited</option>
+                    </select>`;
+                }
+
+                const priorityClass = `priority-${client.priority || 'low'}`;
+                const priorityText = (client.priority || 'low').charAt(0).toUpperCase() + (client.priority || 'low').slice(1);
+                
+                const actionsCellHTML = isAdminView
+                ? `<td class="actions-cell">
+                        <button class="action-btn edit-btn" title="Edit" onclick="editClient('${client.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn archive-btn" title="Archive" onclick="archiveClient('${client.id}', '${client.name}')"><i class="fas fa-archive"></i></button>
+                    </td>`
+                : '';
+
+
+                row.innerHTML = `
+                    ${isAdminView ? `<td><input type="checkbox" class="client-checkbox" data-id="${client.id}"></td>` : ''}
+                    <td><strong>${client.name || 'N/A'}</strong><br><a href="#" onclick="openWhatsApp('${client.id}'); return false;" class="whatsapp-link"><i class="fab fa-whatsapp"></i> ${client.phone || 'N/A'}</a></td>
+                    <td><small><strong>Nat:</strong> ${client.nationality || 'N/A'}</small><br><small><strong>Loc:</strong> ${client.location || 'N/A'}</small><br><small><strong>Visit:</strong> ${client.visitTime ? new Date(client.visitTime).toLocaleDateString() : 'N/A'}</small></td>
+                    <td>${visaDetailsHTML}<br>${certDetailsHTML}</td>
+                    <td><small>Comp:</small> ${client.companyPrice || 'N/A'}<br><small>Client:</small> ${client.clientQuotedPrice || 'N/A'}</td>
+                    <td>${statusDisplayHTML}</td>
+                    <td><div class="priority-tag ${priorityClass}">${priorityText}</div></td>
+                    ${actionsCellHTML}
+                `;
+            });
+            if (!isAdminView) {
+                document.querySelectorAll('#clientsTable #actionsHeader').forEach(th => th.style.display = 'none');
+                document.querySelectorAll('#clientsTable .actions-cell').forEach(cell => cell.style.display = 'none');
+            }
+        }
+        
+        function renderArchivedClientData(clients) {
+             archivedCardsContainer.innerHTML = '';
+            if (clients.length === 0) {
+                archivedCardsContainer.innerHTML = `<p style="text-align:center; color:var(--gray); grid-column: 1 / -1;">No archived leads found.</p>`;
+                return;
+            }
+             clients.forEach(client => {
+                const archivedDate = client.archivedTimestamp ? new Date(client.archivedTimestamp).toLocaleString() : 'N/A';
+                const card = document.createElement('div');
+                card.className = 'info-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h4>${client.name || 'N/A'}</h4>
+                        <div class="actions-cell">
+                            <button class="action-btn restore-btn" title="Restore" onclick="restoreClient('${client.id}', '${client.name}')"><i class="fas fa-undo"></i></button>
+                            <button class="action-btn delete-btn" title="Delete Permanently" onclick="deleteClient('${client.id}', '${client.name}')"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Phone:</strong> ${client.phone || 'N/A'}</p>
+                        <p><strong>Archived by:</strong> ${client.lastUpdatedBy || 'N/A'}</p>
+                        <p><strong>Archived on:</strong> ${archivedDate}</p>
+                    </div>
+                `;
+                archivedCardsContainer.appendChild(card);
+            });
+        }
+        
+        // --- CLIENT ACTIONS ---
+        window.editClient = function(clientId) {
+            const isAdminView = currentUserRole === 'admin' || currentUserRole === 'main-admin';
+            if (!isAdminView) return;
+            const client = [...allClientsData, ...archivedClientsData].find(c => c.id === clientId);
+            if (!client) return showToast('Client not found.', false);
+
+            document.getElementById('clientName').value = client.name || '';
+            document.getElementById('phone').value = client.phone || '';
+            document.getElementById('nationality').value = client.nationality || '';
+            document.getElementById('location').value = client.location || '';
+            document.getElementById('visaStatus').value = client.visaStatus || '';
+            document.getElementById('educationCertificate').value = client.educationCert || '';
+            document.getElementById('desiredSalary').value = client.salary || '';
+            document.getElementById('visitTime').value = client.visitTime || '';
+            document.getElementById('priority').value = client.priority || 'low';
+            document.getElementById('clientQuotedPrice').value = client.clientQuotedPrice || '';
+
+            handleVisaStatusChange();
+            if (client.visaStatus === 'visit') document.getElementById('daysLeft').value = client.visaInfo?.daysLeft || '';
+            else if (client.visaStatus === 'cancelled') {
+                document.getElementById('cancelledDate').value = client.visaInfo?.cancelledDate || '';
+                document.getElementById('cancelledDaysLeft').value = client.visaInfo?.daysLeft || '';
+            } else if (client.visaStatus === 'active' && client.visaInfo?.needFor) {
+                const radio = document.querySelector(`input[name="needFor"][value="${client.visaInfo.needFor}"]`);
+                if(radio) radio.checked = true;
+                handleActiveVisaChange();
+                if (client.visaInfo.needFor === 'yourself') document.getElementById('whenDate').value = client.visaInfo.when || '';
+                else document.getElementById('forWhom').value = client.visaInfo.forWhom || '';
+            }
+            
+            handleEducationCertificateChange();
+            if(client.educationCert === 'yes') document.getElementById('position').value = client.position || '';
+
+            updateCompanyPrice();
+
+            currentEditingClientId = clientId;
+            formTitle.textContent = "Edit Client Lead";
+            saveClientBtn.innerHTML = '<i class="fas fa-save"></i> Update Client';
+            cancelEditBtn.classList.remove('hidden');
+            clearFormBtn.classList.add('hidden');
+            navigateToPage('addClientPanel');
+        };
+        
+        window.updateStatus = function(clientId, status, clientName) {
+            database.ref(`${leadsRefPath}/${clientId}/status`).set(status)
+                .then(() => showToast("Status updated successfully.", true))
+                .catch(error => showToast(`Error updating status: ${error.message}`, false));
+        };
+        
+        window.deleteClient = function(clientId, clientName) {
+            showConfirmation('Delete Permanently?', `You are about to permanently delete ${clientName}. This action cannot be undone.`, () => {
+                database.ref(`${leadsRefPath}/${clientId}`).remove()
+                    .then(() => {
+                        showToast("Client permanently deleted.", true);
+                    })
+                    .catch(error => showToast(`Error: ${error.message}`, false));
+            });
+        };
+        
+        window.archiveClient = function(clientId, clientName) {
+            showConfirmation('Archive Lead?', `Are you sure you want to archive ${clientName}?`, () => {
+                const updateData = { 
+                    isArchived: true, 
+                    archivedTimestamp: new Date().toISOString(),
+                    lastUpdatedBy: currentUser.email
+                };
+                database.ref(`${leadsRefPath}/${clientId}`).update(updateData)
+                .then(() => {
+                    showToast(`${clientName} has been archived.`, true);
+                });
+            });
+        }
+
+        window.restoreClient = function(clientId, clientName) {
+             showConfirmation('Restore Lead?', `Are you sure you want to restore ${clientName}?`, () => {
+                const updateData = { 
+                    isArchived: false, 
+                    archivedTimestamp: null,
+                    lastUpdatedBy: currentUser.email
+                };
+                database.ref(`${leadsRefPath}/${clientId}`).update(updateData)
+                .then(() => {
+                    showToast(`${clientName} has been restored.`, true);
+                });
+            });
+        }
+        
+        function updateCompanyPrice() {
+            const nationality = nationalitySelect.value;
+            const location = locationSelect.value;
+            const visaStatus = visaStatusSelect.value;
+            
+            const priceDisplay = document.getElementById('companyPriceDisplay');
+            const pricingSection = document.getElementById('pricingSection');
+            const nigerianInfo = document.getElementById('nigerianVisaInfo');
+            const nigerianNotAvailableInfo = document.getElementById('nigerianNotAvailableInfo');
+            
+            nigerianInfo.classList.add('hidden');
+            nigerianNotAvailableInfo.classList.add('hidden');
+            saveClientBtn.disabled = false;
+
+            if (!nationality || !location) {
+                pricingSection.classList.add('hidden');
+                return;
+            }
+            
+            pricingSection.classList.remove('hidden');
+            let price = 0;
+            let priceText = 'N/A';
+
+            if (nationality === 'Nigerian') {
+                if (location === 'Inside UAE' && visaStatus === 'cancelled') {
+                    price = 7500;
+                    nigerianInfo.classList.remove('hidden');
+                } else {
+                    nigerianNotAvailableInfo.classList.remove('hidden');
+                    saveClientBtn.disabled = true;
+                    price = 0;
+                }
+            } else {
+                 switch (nationality) {
+                    case 'India':
+                        price = (location === 'Inside UAE') ? 7999 : 6999;
+                        break;
+                    case 'Pakistan':
+                        price = (location === 'Inside UAE') ? 7999 : 12000;
+                        break;
+                    case 'Other':
+                        price = (location === 'Inside UAE') ? 6499 : 5499;
+                        break;
+                }
+            }
+
+            if (price > 0) {
+                priceText = `${price.toLocaleString()} AED`;
+            } else if (saveClientBtn.disabled) {
+                 priceText = 'Not Available';
+            }
+            
+            priceDisplay.textContent = priceText;
+        }
+
+
+        // --- ADMIN ACTIONS ---
+        function applyFilters() {
+            if (!allClientsData || !searchInput) return;
+            const searchTerm = searchInput.value.toLowerCase();
+            const visaFilter = filterVisaStatus.value;
+            const statusFilter = filterOverallStatus.value;
+            const filteredClients = allClientsData.filter(client => 
+                ((client.name || '').toLowerCase().includes(searchTerm) || (client.phone || '').toLowerCase().includes(searchTerm)) &&
+                (!visaFilter || client.visaStatus === visaFilter) &&
+                (!statusFilter || client.status === statusFilter)
+            );
+            renderClientData(filteredClients);
+        }
+        
+        function handleSelectAll(e) {
+            document.querySelectorAll('#clientsTable tbody .client-checkbox').forEach(cb => cb.checked = e.target.checked);
+            bulkDeleteBtn.classList.toggle('hidden', !e.target.checked);
+        }
+        
+        function handleBulkArchive() {
+            const selectedIds = Array.from(document.querySelectorAll('.client-checkbox:checked')).map(cb => cb.dataset.id);
+            if(selectedIds.length === 0) return;
+            showConfirmation('Archive Selected?', `Are you sure you want to archive ${selectedIds.length} client(s)?`, () => {
+                const updates = {};
+                selectedIds.forEach(id => {
+                    updates[`${leadsRefPath}/${id}/isArchived`] = true;
+                    updates[`${leadsRefPath}/${id}/archivedTimestamp`] = new Date().toISOString();
+                    updates[`${leadsRefPath}/${id}/lastUpdatedBy`] = currentUser.email;
+                });
+                database.ref().update(updates)
+                    .then(() => {
+                        showToast(`${selectedIds.length} clients archived.`, true);
+                    });
+            });
+        }
+        
+        // --- DASHBOARD ---
+        function loadDashboardData() {
+            const visaCanvas = document.getElementById('visaStatusChart');
+            const overallCanvas = document.getElementById('overallStatusChart');
+            
+            if (visaStatusChart) { visaStatusChart.destroy(); }
+            if (overallStatusChart) { overallStatusChart.destroy(); }
+            
+            if (!allClientsData) return;
+            
+            const activeClients = allClientsData.filter(c => !c.isArchived);
+            const visaStatusCounts = activeClients.reduce((acc, c) => { acc[c.visaStatus] = (acc[c.visaStatus] || 0) + 1; return acc; }, {});
+            const overallStatusCounts = activeClients.reduce((acc, c) => { acc[c.status] = (acc[c.status] || 0) + 1; return acc; }, {});
+            
+            const chartOptions = (title) => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    title: { display: true, text: title, font: { size: 16 } } ,
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            });
+
+            visaStatusChart = new Chart(visaCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(visaStatusCounts),
+                    datasets: [{ data: Object.values(visaStatusCounts), backgroundColor: chartColors }]
+                },
+                options: chartOptions('Leads by Visa Status')
+            });
+
+            overallStatusChart = new Chart(overallCanvas, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(overallStatusCounts),
+                    datasets: [{ label: 'Lead Count', data: Object.values(overallStatusCounts), backgroundColor: chartColors }]
+                },
+                options: { ...chartOptions('Leads by Overall Status'), scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // --- USER MANAGEMENT ---
+        function loadUserManagement() {
+            if(currentUserRole !== 'main-admin') return;
+            const tableBody = document.getElementById('userManagementTableBody');
+            tableBody.innerHTML = '<tr><td colspan="3"><div class="loading-spinner"></div></td></tr>';
+
+            database.ref(usersRefPath).once('value', snapshot => {
+                tableBody.innerHTML = '';
+                if(snapshot.exists()) {
+                    snapshot.forEach(childSnap => {
+                        const userData = childSnap.val();
+                        const uid = childSnap.key;
+                        if(userData.email === MAIN_ADMIN_EMAIL) return;
+
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${userData.email}</td>
+                            <td><span class="role-badge ${userData.role}">${userData.role}</span></td>
+                            <td class="actions-cell">
+                                <select class="status-select" onchange="updateUserRole('${uid}', this.value, '${userData.email}')">
+                                    <option value="user" ${userData.role === 'user' ? 'selected' : ''}>User</option>
+                                    <option value="manager" ${userData.role === 'manager' ? 'selected' : ''}>Manager</option>
+                                    <option value="admin" ${userData.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                </select>
+                                <button class="action-btn delete-btn" title="Delete User" onclick="deleteUser('${uid}', '${userData.email}')"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        `;
+                    });
+                }
+            });
+        }
+
+        window.updateUserRole = function(uid, newRole, userEmailForLog) {
+            if(currentUserRole !== 'main-admin') return;
+            database.ref(`${usersRefPath}/${uid}/role`).set(newRole)
+            .then(() => {
+                showToast("User role updated successfully.", true);
+                loadUserManagement();
+            }).catch(err => {
+                showToast("Error updating user role: " + err.message, false);
+            })
+        }
+        
+        window.deleteUser = function(uid, email) {
+            if(currentUserRole !== 'main-admin') return;
+            const confirmationMessage = `Are you sure you want to remove ${email}? This will permanently revoke their access to the application.`;
+            showConfirmation('Delete User?', confirmationMessage, () => {
+                // This removes the user's role and permissions from the database.
+                // NOTE: This does NOT delete the user from Firebase Authentication. That requires a backend Cloud Function for security reasons.
+                // However, with the check in initApp(), the user will be signed out immediately if they try to log in.
+                database.ref(`${usersRefPath}/${uid}`).remove()
+                .then(() => {
+                    showToast('User deleted successfully.', true);
+                    loadUserManagement();
+                }).catch(err => {
+                    showToast(`Error deleting user: ${err.message}`, false);
+                });
+            });
+        }
+
+        // --- LANGUAGE SUPPORT ---
+        const translations = {
+            en: {
+                dashboard: "Dashboard",
+                addNewLead: "Add New Client Lead",
+                clientData: "Client Data",
+                archivedLeads: "Archived Leads",
+                settings: "Settings",
+                clientName: "Client Name",
+                phone: "Phone Number",
+                nationality: "Nationality",
+                location: "Location",
+                visaStatus: "Current Visa Status",
+                educationCertificate: "Attested Education Certificate",
+                daysLeft: "How many days left?",
+                cancelledDate: "When was it cancelled?",
+                cancelledDaysLeft: "How many days are left?",
+                needFor: "Need for yourself or someone else?",
+                forYourself: "For yourself",
+                forSomeoneElse: "For someone else",
+                when: "When?",
+                forWhom: "For whom do you need a visa?",
+                desiredSalary: "Desired Salary",
+                visitTime: "Time of Visit to Our Office",
+                position: "What position to mention on ID?",
+                salesOfficerOnly: "Only Sales Officer will be available",
+                companyPrice: "Company Price",
+                selectNationalityLocation: "Select nationality and location first",
+                quotedPrice: "Price Quoted to Client (AED)",
+                freezoneVisa: "This will be a Freezone visa.",
+                nigerianNotAvailable: "Service not available for Nigerians outside UAE or with non-cancelled visa.",
+                priority: "Priority",
+                low: "Low",
+                medium: "Medium",
+                high: "High",
+                saveClient: "Save Client",
+                clearForm: "Clear Form",
+                cancelEdit: "Cancel Edit",
+                search: "Search:",
+                visaStatusFilter: "Visa Status:",
+                overallStatusFilter: "Overall Status:",
+                archiveSelected: "Archive Selected",
+                clientContact: "Client & Contact",
+                details: "Details",
+                visaEducation: "Visa & Education",
+                pricing: "Pricing (AED)",
+                status: "Status",
+                actions: "Actions",
+                changePassword: "Change Your Password",
+                currentPassword: "Current Password",
+                newPassword: "New Password",
+                confirmNewPassword: "Confirm New Password",
+                updatePassword: "Update Password",
+                userManagement: "User Management",
+                userEmailHeader: "User Email",
+                currentRole: "Current Role",
+                changeRole: "Change Role",
+                createUser: "Create New User",
+                newUserEmail: "New User's Email",
+                newUserPassword: "Password",
+                assignRole: "Assign Role",
+                createUserBtn: "Create User",
+            },
+            hi: {
+                dashboard: "डैशबोर्ड",
+                addNewLead: "नया क्लाइंट लीड जोड़ें",
+                clientData: "क्लाइंट डेटा",
+                archivedLeads: "संग्रहीत लीड्स",
+                settings: "सेटिंग्स",
+                clientName: "ग्राहक का नाम",
+                phone: "फ़ोन नंबर",
+                nationality: "राष्ट्रीयता",
+                location: "स्थान",
+                visaStatus: "वर्तमान वीज़ा स्थिति",
+                educationCertificate: "सत्यापित शिक्षा प्रमाण पत्र",
+                daysLeft: "कितने दिन बचे हैं?",
+                cancelledDate: "यह कब रद्द किया गया था?",
+                cancelledDaysLeft: "कितने दिन बचे हैं?",
+                needFor: "अपने लिए या किसी और के लिए चाहिए?",
+                forYourself: "अपने लिए",
+                forSomeoneElse: "किसी और के लिए",
+                when: "कब?",
+                forWhom: "आपको किसके लिए वीजा चाहिए?",
+                desiredSalary: "अपेक्षित वेतन",
+                visitTime: "हमारे कार्यालय में आने का समय",
+                position: "आईडी पर कौन सा पद उल्लेख करना है?",
+                salesOfficerOnly: "केवल बिक्री अधिकारी उपलब्ध होगा",
+                companyPrice: "कंपनी मूल्य",
+                selectNationalityLocation: "पहले राष्ट्रीयता और स्थान चुनें",
+                quotedPrice: "ग्राहक को बताई गई कीमत (AED)",
+                freezoneVisa: "यह एक फ्रीज़ोन वीज़ा होगा।",
+                nigerianNotAvailable: "नाइजीरियाई लोगों के लिए सेवा उपलब्ध नहीं है जो यूएई के बाहर हैं या गैर-रद्द वीजा के साथ हैं।",
+                priority: "प्राथमिकता",
+                low: "कम",
+                medium: "मध्यम",
+                high: "उच्च",
+                saveClient: "क्लाइंट सहेजें",
+                clearForm: "फ़ॉर्म साफ़ करें",
+                cancelEdit: "संपादन रद्द करें",
+                search: "खोज:",
+                visaStatusFilter: "वीज़ा स्थिति:",
+                overallStatusFilter: "समग्र स्थिति:",
+                archiveSelected: "चयनित को संग्रहीत करें",
+                clientContact: "क्लाइंट और संपर्क",
+                details: "विवरण",
+                visaEducation: "वीजा और शिक्षा",
+                pricing: "मूल्य निर्धारण (AED)",
+                status: "स्थिति",
+                actions: "कार्रवाइयां",
+                changePassword: "अपना पासवर्ड बदलें",
+                currentPassword: "वर्तमान पासवर्ड",
+                newPassword: "नया पासवर्ड",
+                confirmNewPassword: "नए पासवर्ड की पुष्टि करें",
+                updatePassword: "पासवर्ड अपडेट करें",
+                userManagement: "उपयोगकर्ता प्रबंधन",
+                userEmailHeader: "उपयोगकर्ता ईमेल",
+                currentRole: "वर्तमान भूमिका",
+                changeRole: "भूमिका बदलें",
+                createUser: "नया उपयोगकर्ता बनाएं",
+                newUserEmail: "नए उपयोगकर्ता का ईमेल",
+                newUserPassword: "पासवर्ड",
+                assignRole: "भूमिका सौंपें",
+                createUserBtn: "उपयोगकर्ता बनाएं",
+            },
+            ar: {
+                dashboard: "لوحة التحكم",
+                addNewLead: "إضافة عميل محتمل جديد",
+                clientData: "بيانات العميل",
+                archivedLeads: "العملاء المحتملون المؤرشفون",
+                settings: "الإعدادات",
+                clientName: "اسم العميل",
+                phone: "رقم الهاتف",
+                nationality: "الجنسية",
+                location: "الموقع",
+                visaStatus: "حالة التأشيرة الحالية",
+                educationCertificate: "شهادة التعليم المصدقة",
+                daysLeft: "كم عدد الأيام المتبقية؟",
+                cancelledDate: "متى تم إلغاؤها؟",
+                cancelledDaysLeft: "كم عدد الأيام المتبقية؟",
+                needFor: "هل تحتاجها لنفسك أم لشخص آخر؟",
+                forYourself: "لنفسك",
+                forSomeoneElse: "لشخص آخر",
+                when: "متى؟",
+                forWhom: "لمن تحتاج التأشيرة؟",
+                desiredSalary: "الراتب المطلوب",
+                visitTime: "وقت زيارة مكتبنا",
+                position: "ما هو المنصب الذي يجب ذكره في الهوية؟",
+                salesOfficerOnly: "سيكون مسؤول المبيعات فقط متاحًا",
+                companyPrice: "سعر الشركة",
+                selectNationalityLocation: "الرجاء اختيار الجنسية والموقع أولاً",
+                quotedPrice: "السعر المعروض للعميل (درهم)",
+                freezoneVisa: "ستكون هذه تأشيرة منطقة حرة.",
+                nigerianNotAvailable: "الخدمة غير متوفرة للنيجيريين خارج الإمارات العربية المتحدة أو الذين لديهم تأشيرة غير ملغاة.",
+                priority: "الأولوية",
+                low: "منخفض",
+                medium: "متوسط",
+                high: "عالي",
+                saveClient: "حفظ العميل",
+                clearForm: "مسح النموذج",
+                cancelEdit: "إلغاء التعديل",
+                search: "بحث:",
+                visaStatusFilter: "حالة التأشيرة:",
+                overallStatusFilter: "الحالة العامة:",
+                archiveSelected: "أرشفة المحدد",
+                clientContact: "العميل والاتصال",
+                details: "التفاصيل",
+                visaEducation: "التأشيرة والتعليم",
+                pricing: "التسعير (درهم)",
+                status: "الحالة",
+                actions: "الإجراءات",
+                changePassword: "تغيير كلمة المرور الخاصة بك",
+                currentPassword: "كلمة المرور الحالية",
+                newPassword: "كلمة المرور الجديدة",
+                confirmNewPassword: "تأكيد كلمة المرور الجديدة",
+                updatePassword: "تحديث كلمة المرور",
+                userManagement: "إدارة المستخدمين",
+                userEmailHeader: "البريد الإلكتروني للمستخدم",
+                currentRole: "الدور الحالي",
+                changeRole: "تغيير الدور",
+                createUser: "إنشاء مستخدم جديد",
+                newUserEmail: "البريد الإلكتروني للمستخدم الجديد",
+                newUserPassword: "كلمة المرور",
+                assignRole: "تعيين دور",
+                createUserBtn: "إنشاء مستخدم",
+            }
+        };
+
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            localStorage.setItem('language', lang);
+            
+            // Update custom dropdown display
+            const selectedOption = document.querySelector(`.language-option[data-lang-value="${lang}"]`);
+            if (selectedOption) {
+                selectedLanguageText.innerHTML = `<i class="fas fa-globe"></i> ${selectedOption.querySelector('span').textContent}`;
+                document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('selected'));
+                selectedOption.classList.add('selected');
+            }
+
+            // Translate all elements with data-lang attribute
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[lang] && translations[lang][key]) {
+                    const textSpan = el.querySelector('span');
+                    if(textSpan && el.querySelector('i')) {
+                        const iconHTML = el.querySelector('i').outerHTML;
+                        el.innerHTML = iconHTML + ' ' + translations[lang][key];
+                    } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translations[lang][key];
+                    } else {
+                        el.textContent = translations[lang][key];
+                    }
+                }
+            });
+        }
+        
+        // --- INITIALIZATION ---
+        window.addEventListener('load', () => {
+            // Assign DOM elements once the document is loaded
+            loginScreen = document.getElementById('loginScreen');
+            appContainer = document.getElementById('appContainer');
+            loginForm = document.getElementById('loginForm');
+            sidebarLinks = document.querySelectorAll('.sidebar-link');
+            pages = document.querySelectorAll('.page');
+            pageTitle = document.getElementById('pageTitle');
+            clientForm = document.getElementById('clientForm');
+            clearFormBtn = document.getElementById('clearFormBtn');
+            cancelEditBtn = document.getElementById('cancelEditBtn');
+            clientsTableBody = document.getElementById('clientsTable').getElementsByTagName('tbody')[0];
+            archivedCardsContainer = document.getElementById('archived-cards-container');
+            toast = document.getElementById('toast');
+            toastMessage = document.getElementById('toastMessage');
+            userAvatar = document.getElementById('userAvatar');
+            userName = document.getElementById('userName');
+            userEmail = document.getElementById('userEmail');
+            saveClientBtn = document.getElementById('saveClientBtn');
+            adminControls = document.getElementById('adminControls');
+            bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            actionsHeader = document.getElementById('actionsHeader');
+            formTitle = document.getElementById('formTitle');
+            searchInput = document.getElementById('searchInput');
+            filterVisaStatus = document.getElementById('filterVisaStatus');
+            filterOverallStatus = document.getElementById('filterOverallStatus');
+            changePasswordForm = document.getElementById('changePasswordForm');
+            createUserForm = document.getElementById('createUserForm');
+            visaStatusSelect = document.getElementById('visaStatus');
+            educationCertificate = document.getElementById('educationCertificate');
+            nationalitySelect = document.getElementById('nationality');
+            locationSelect = document.getElementById('location');
+            userProfileContainer = document.getElementById('userProfileContainer');
+            profilePopover = document.getElementById('profilePopover');
+            adminSettingsBtn = document.getElementById('adminSettingsBtn');
+            logoutBtn = document.getElementById('logoutBtn');
+            languageToggle = document.getElementById('language-toggle');
+            languageOptions = document.getElementById('language-options');
+            selectedLanguageText = document.getElementById('selected-language-text');
+
+
+            // Now initialize the app and listeners
+            initApp();
+            initEventListeners();
+            const savedLang = localStorage.getItem('language') || 'en';
+            setLanguage(savedLang);
+        });
+    </script>
+</body>
+</html>
